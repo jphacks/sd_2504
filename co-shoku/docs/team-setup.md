@@ -34,6 +34,7 @@ npm run start        # or npx expo start
 ## 環境変数の扱い
 - 機密値は `.env` に記入し、Git にはコミットしない（`.gitignore` 済み）。
 - 新しい環境変数が必要になったら `.env.example` にも同じキーを追加して他メンバーに共有する。
+- Firebase の API キーなどが一度でも公開リポに含まれた場合は、Firebase コンソールでキーをローテーションしてから `.env` に設定し直す。
 
 ## PR 作成時の推奨チェックリスト
 - [ ] `npm ci` からのクリーン状態で `npm run start` が成功するか

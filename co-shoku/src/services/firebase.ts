@@ -35,15 +35,32 @@ import {
 } from 'firebase/storage';
 import { User, Post } from '../types';
 
-// The Firebase configuration supplied for the Co-食 project.
+type FirebaseEnvKey =
+  | 'EXPO_PUBLIC_FIREBASE_API_KEY'
+  | 'EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN'
+  | 'EXPO_PUBLIC_FIREBASE_PROJECT_ID'
+  | 'EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'
+  | 'EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'
+  | 'EXPO_PUBLIC_FIREBASE_APP_ID'
+  | 'EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID';
+
+const requireEnv = (key: FirebaseEnvKey): string => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+  return value;
+};
+
+// Firebase configuration is resolved from Expo public environment variables.
 export const firebaseConfig = {
-  apiKey: 'AIzaSyBXvSsF-2ycOyQxsFU2pnG8ojGnEMmGE0w',
-  authDomain: 'co-shoku.firebaseapp.com',
-  projectId: 'co-shoku',
-  storageBucket: 'co-shoku.firebasestorage.app',
-  messagingSenderId: '19947917839',
-  appId: '1:19947917839:web:424589580d01152a00097a',
-  measurementId: 'G-GY6MN64S0P',
+  apiKey: requireEnv('EXPO_PUBLIC_FIREBASE_API_KEY'),
+  authDomain: requireEnv('EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN'),
+  projectId: requireEnv('EXPO_PUBLIC_FIREBASE_PROJECT_ID'),
+  storageBucket: requireEnv('EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: requireEnv('EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'),
+  appId: requireEnv('EXPO_PUBLIC_FIREBASE_APP_ID'),
+  measurementId: requireEnv('EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID'),
 };
 
 let firebaseApp: FirebaseApp | null = null;

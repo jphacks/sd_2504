@@ -6,8 +6,9 @@ React Native / Expo implementation draft that follows the provided requirements 
 
 1. Node.js を `nvm use` で `.nvmrc` (Node 20 LTS) に合わせる  
 2. 依存関係は `npm ci` で再構築（`node_modules/` は Git 管理しない）  
-3. Expo を起動する際は `npm run start` もしくは `npx expo start`  
-4. うまく動かない場合は `npx expo-doctor` や `npm run start -- --clear` でキャッシュをクリア
+3. `cp .env.example .env` で環境変数を用意し、Firebase キーなどを記入する  
+4. Expo を起動する際は `npm run start` もしくは `npx expo start`  
+5. うまく動かない場合は `npx expo-doctor` や `npm run start -- --clear` でキャッシュをクリア
 
 Why `npm install`/`npm ci` locally?  
 `package.json` と `package-lock.json` を Git で共有し、各開発者がローカルで依存関係をインストールするのが Node プロジェクトの標準的な運用です。`node_modules/` をコミットしないことで、環境差分が起こっても必要なモジュールを再構築でき、Expo のローカル CLI も自動的に導入されます。
