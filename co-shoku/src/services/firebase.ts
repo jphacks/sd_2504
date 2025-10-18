@@ -7,6 +7,7 @@ import {
   signOut,
   updateProfile,
   onAuthStateChanged,
+  type Auth,
   type User as FirebaseUser,
 } from 'firebase/auth';
 import {
@@ -35,22 +36,28 @@ import {
 } from 'firebase/storage';
 import { User, Post } from '../types';
 import { getSupabaseClient, getSupabaseBucket } from './supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type FirebaseEnvKey =
+type FirebaseRequiredKey =
   | 'EXPO_PUBLIC_FIREBASE_API_KEY'
   | 'EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN'
   | 'EXPO_PUBLIC_FIREBASE_PROJECT_ID'
   | 'EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'
   | 'EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'
-  | 'EXPO_PUBLIC_FIREBASE_APP_ID'
-  | 'EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID';
+  | 'EXPO_PUBLIC_FIREBASE_APP_ID';
 
-const requireEnv = (key: FirebaseEnvKey): string => {
+type FirebaseOptionalKey = 'EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID';
+
+const requireEnv = (key: FirebaseRequiredKey): string => {
   const value = process.env[key];
   if (!value) {
     throw new Error(`Missing required environment variable: ${key}`);
   }
   return value;
+};
+
+const optionalEnv = (key: FirebaseOptionalKey): string | undefined => {
+  return process.env[key];
 };
 
 // Firebase configuration is resolved from Expo public environment variables.
@@ -61,13 +68,15 @@ export const firebaseConfig = {
   storageBucket: requireEnv('EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'),
   messagingSenderId: requireEnv('EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'),
   appId: requireEnv('EXPO_PUBLIC_FIREBASE_APP_ID'),
-  measurementId: requireEnv('EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID'),
+  // 任意（未設定なら undefined のままでOK）
+  measurementId: optionalEnv('EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID'),
 };
 
 let firebaseApp: FirebaseApp | null = null;
 let analyticsInstance: Analytics | null = null;
 let firestoreInstance: Firestore | null = null;
 let storageInstance: FirebaseStorage | null = null;
+let authInstance: Auth | null = null;
 
 const USERS_COLLECTION = 'users';
 const POSTS_COLLECTION = 'posts';
@@ -80,6 +89,21 @@ const HISTORY_COLLECTION = 'foodHistory';
 export const initializeFirebase = async (): Promise<{ app: FirebaseApp; analytics: Analytics | null }> => {
   if (!firebaseApp) {
     firebaseApp = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
+    if (!authInstance) {
+      try {
+        const authModule: any = await import('firebase/auth');
+        if (authModule.initializeAuth && authModule.getReactNativePersistence) {
+          authInstance = authModule.initializeAuth(firebaseApp, {
+            persistence: authModule.getReactNativePersistence(AsyncStorage),
+          });
+        } else {
+          authInstance = getAuth(firebaseApp);
+        }
+      } catch (error) {
+        // initializeAuth throws if called twice. In that case fall back to getAuth.
+        authInstance = getAuth(firebaseApp);
+      }
+    }
     firestoreInstance = getFirestore(firebaseApp);
     storageInstance = getStorage(firebaseApp);
 
@@ -105,7 +129,10 @@ export const getFirebaseAuth = () => {
   if (!firebaseApp) {
     throw new Error('Firebase app is not initialized. Call initializeFirebase first.');
   }
-  return getAuth(firebaseApp);
+  if (!authInstance) {
+    authInstance = getAuth(firebaseApp);
+  }
+  return authInstance;
 };
 
 export const getFirebaseFirestore = () => {
