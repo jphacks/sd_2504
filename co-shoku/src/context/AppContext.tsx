@@ -55,6 +55,7 @@ type AppContextValue = {
   canPostToday: boolean;
   dailyPostCount: number;
   maxDailyPosts: number;
+  isDailyPostLimitEnabled: boolean;
   createPost: (payload: CreatePostPayload) => Promise<Post>;
   unlockUntil: string | null;
   isUnlockActive: boolean;
@@ -103,8 +104,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [unlockUntil, setUnlockUntil] = useState<string | null>(null);
   const [hasPostedOnce, setHasPostedOnce] = useState(false);
   const [miracleMatchPoints, setMiracleMatchPoints] = useState(0);
-  const maxDailyPosts = 3;
   const isFirstAuthEventHandled = useRef(false);
+  const isDevEnvironment = process.env.NODE_ENV !== 'production';
+  const parsedEnvLimit = process.env.EXPO_PUBLIC_DAILY_POST_LIMIT != null
+    ? Number(process.env.EXPO_PUBLIC_DAILY_POST_LIMIT)
+    : NaN;
+  const rawDailyLimit = Number.isFinite(parsedEnvLimit)
+    ? parsedEnvLimit
+    : isDevEnvironment
+      ? 0
+      : 3;
+  const isDailyPostLimitEnabled = Number.isFinite(rawDailyLimit) && rawDailyLimit > 0;
+  const maxDailyPosts = isDailyPostLimitEnabled ? rawDailyLimit : Number.POSITIVE_INFINITY;
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -231,11 +242,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const canPostToday = useMemo(() => {
+    if (!isDailyPostLimitEnabled) {
+      return true;
+    }
     if (shouldResetDailyCount(nextResetAt)) {
       return true;
     }
     return dailyPostCount < maxDailyPosts;
-  }, [dailyPostCount, maxDailyPosts, nextResetAt]);
+  }, [dailyPostCount, isDailyPostLimitEnabled, maxDailyPosts, nextResetAt]);
 
   const createPost = useCallback(
     async ({ category, imageUri }: CreatePostPayload) => {
@@ -243,10 +257,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         throw new Error('投稿にはログインが必要です。');
       }
       const timestamp = now();
-      const requiresReset = shouldResetDailyCount(nextResetAt, timestamp);
-      const effectiveCount = requiresReset ? 0 : dailyPostCount;
-      if (effectiveCount >= maxDailyPosts) {
-        throw new Error('本日の投稿上限に達しました（1日3回まで）。');
+      let requiresReset = false;
+      let effectiveCount = dailyPostCount;
+      if (isDailyPostLimitEnabled) {
+        requiresReset = shouldResetDailyCount(nextResetAt, timestamp);
+        effectiveCount = requiresReset ? 0 : dailyPostCount;
+        if (effectiveCount >= maxDailyPosts) {
+          throw new Error('本日の投稿上限に達しました（1日3回まで）。');
+        }
       }
 
       const postedAt = toIsoString(timestamp);
@@ -287,18 +305,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
       setPosts((prev) => mergePosts(prev, [post]));
       setFoodHistory((prev) => [historyEntry, ...prev]);
-      const nextCount = effectiveCount + 1;
-      setDailyPostCount(nextCount);
-
-      if (!nextResetAt || requiresReset) {
-        setNextResetAt(toIsoString(new Date(getNextResetTimestampJst(timestamp))));
+      if (isDailyPostLimitEnabled) {
+        const nextCount = effectiveCount + 1;
+        setDailyPostCount(nextCount);
+        if (!nextResetAt || requiresReset) {
+          setNextResetAt(toIsoString(new Date(getNextResetTimestampJst(timestamp))));
+        }
+      } else {
+        setDailyPostCount((prev) => prev + 1);
       }
 
       setUnlockUntil(expiresAt);
       setHasPostedOnce(true);
       return post;
     },
-    [dailyPostCount, maxDailyPosts, nextResetAt, user]
+    [dailyPostCount, isDailyPostLimitEnabled, maxDailyPosts, nextResetAt, user]
   );
 
   const getTimelineForCategory = useCallback(
@@ -393,6 +414,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     canPostToday,
     dailyPostCount,
     maxDailyPosts,
+    isDailyPostLimitEnabled,
     createPost,
     unlockUntil,
     isUnlockActive,

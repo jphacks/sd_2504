@@ -39,10 +39,12 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 EXPO_PUBLIC_FIREBASE_APP_ID=...
 EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=...
+EXPO_PUBLIC_DAILY_POST_LIMIT=3
 ```
 
 > Note: `EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET` defaults to `posts` when omitted.  
-> Firebase keys are required at build time; measurementId is optional if Analytics is disabled.
+> Firebase keys are required at build time; measurementId is optional if Analytics is disabled.  
+> Set `EXPO_PUBLIC_DAILY_POST_LIMIT` to `0` (or omit it) for unlimited daily postings during development.
 
 ## Project Structure
 
@@ -63,7 +65,7 @@ co-shoku/
 
 - **Navigation flow** mirrors the requirement document: splash → auth → tutorial (first launch) → home, with gated access to timeline, dining room, and one-on-one talk.
 - **App state** lives in `AppContext`, which simulates authentication, posting, unlock windows, miracle match scoring, and food history aggregation. This is the primary point to integrate Firebase Authentication, Firestore, Storage, and Realtime Database calls.
-- **Posting restrictions** (3 posts/day, JST 2:00 reset) and the one-hour feature unlock window are enforced in context utilities.
+- **Posting restrictions** default to 3 posts/day (reset at JST 2:00) via `EXPO_PUBLIC_DAILY_POST_LIMIT`; setting the var to `0` disables the cap temporarily.
 - **Media handling** uses Expo Camera/Image Picker to fetch an image before category selection.
 - **Realtime features** (timeline, dining room, one-on-one talk) are stubbed with deterministic UI to make UX reviews possible until WebRTC / Realtime DB plumbing is wired.
 - **My Page** aggregates the last 30 days of history, renders a bar-graph placeholder instead of a pie chart, and exposes the recommendation algorithm from the specs.

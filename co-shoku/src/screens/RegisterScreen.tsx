@@ -6,6 +6,7 @@ import { ScreenContainer } from '../components/ScreenContainer';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { useAppContext } from '../context/AppContext';
 import { AuthStackParamList } from '../navigation/AppNavigator';
+import { getAuthErrorMessage } from '../utils/firebaseErrors';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 
@@ -22,8 +23,9 @@ export const RegisterScreen = ({ navigation }: Props) => {
     }
     try {
       await register({ nickname, email, password });
-    } catch (error) {
-      Alert.alert('登録に失敗しました', '時間をおいて再度お試しください。');
+    } catch (error: unknown) {
+      const code = (error as { code?: string })?.code;
+      Alert.alert('登録に失敗しました', getAuthErrorMessage(code));
     }
   };
 
@@ -98,4 +100,3 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 });
-
