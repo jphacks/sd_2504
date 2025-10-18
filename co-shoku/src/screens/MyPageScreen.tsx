@@ -56,7 +56,7 @@ const pickSuggestion = (history: FoodHistory[]): string => {
 };
 
 export const MyPageScreen = (_props: Props) => {
-  const { user, foodHistory, miracleMatchPoints } = useAppContext();
+  const { user, foodHistory } = useAppContext();
 
   const parentAggregates = useMemo(() => aggregateParentCounts(foodHistory), [foodHistory]);
   const totalCount = parentAggregates.reduce((sum, item) => sum + item.count, 0);
@@ -68,7 +68,6 @@ export const MyPageScreen = (_props: Props) => {
       <ScrollView>
         <View style={styles.section}>
           <Text style={styles.title}>{user?.nickname ?? 'ユーザー'}さんのマイページ</Text>
-          <Text style={styles.meta}>Miracle Match ポイント: {miracleMatchPoints}</Text>
         </View>
 
         <View style={styles.section}>
@@ -199,4 +198,3 @@ const styles = StyleSheet.create({
     color: '#FF7F50',
   },
 });
-

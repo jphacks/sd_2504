@@ -3,7 +3,6 @@ import { useEffect, useMemo } from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
-import { SecondaryButton } from '../components/SecondaryButton';
 import { useAppContext } from '../context/AppContext';
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { formatDateShort, minutesUntil } from '../utils/time';
@@ -19,10 +18,6 @@ export const TimelineScreen = ({ route, navigation }: Props) => {
   }, [category, refreshTimeline]);
 
   const posts = useMemo(() => getTimelineForCategory(category), [category, getTimelineForCategory]);
-
-  const handleReport = (postId: string) => {
-    navigation.navigate('Report', { reportedUserId: postId });
-  };
 
   return (
     <ScreenContainer>
@@ -45,7 +40,6 @@ export const TimelineScreen = ({ route, navigation }: Props) => {
             <View style={styles.cardBody}>
               <Text style={styles.timestamp}>{formatDateShort(item.postedAt)} 投稿</Text>
               <Text style={styles.expire}>あと {minutesUntil(item.expiresAt)} 分で終了</Text>
-              <SecondaryButton title="通報する" onPress={() => handleReport(item.id)} />
             </View>
           </View>
         )}

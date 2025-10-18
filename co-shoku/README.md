@@ -40,15 +40,14 @@ EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 EXPO_PUBLIC_FIREBASE_APP_ID=...
 EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=...
 EXPO_PUBLIC_DAILY_POST_LIMIT=3
-EXPO_PUBLIC_ZOOM_MEETING_URL=https://zoom.us/j/xxxxxxxxxx?pwd=yyyy
-# (optional) ブラウザ用リンクを別で設定したい場合
-EXPO_PUBLIC_ZOOM_WEB_URL=https://zoom.us/j/xxxxxxxxxx
+# BizMee ルームの対応表を JSON で設定（子カテゴリ → URL）
+EXPO_PUBLIC_BIZMEE_ROOMS={"ポトフ":"https://bizmee.net/rooms/pot-au-feu","焼肉":"https://bizmee.net/rooms/yakiniku"}
 ```
 
 > Note: `EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET` defaults to `posts` when omitted.  
 > Firebase keys are required at build time; measurementId is optional if Analytics is disabled.  
 > Set `EXPO_PUBLIC_DAILY_POST_LIMIT` to `0` (or omit it) for unlimited daily postings during development.  
-> `EXPO_PUBLIC_ZOOM_WEB_URL` を設定すると、Zoom アプリが起動できない場合のブラウザURLとして利用されます。
+> `EXPO_PUBLIC_BIZMEE_ROOMS` は子カテゴリ名をキーにした JSON 文字列です。BizMee のルーム URL を設定してください。
 
 ## Project Structure
 
@@ -68,10 +67,10 @@ co-shoku/
 ## Key Implementation Notes
 
 - **Navigation flow** mirrors the requirement document: splash → auth → tutorial (first launch) → home, with gated access to timeline, dining room, and one-on-one talk.
-- **App state** lives in `AppContext`, which simulates authentication, posting, unlock windows, miracle match scoring, and food history aggregation. This is the primary point to integrate Firebase Authentication, Firestore, Storage, and Realtime Database calls.
+- **App state** lives in `AppContext`, whichシミュレートするのは認証、投稿、解放時間、食事履歴など。Firebase Authentication/Firestore/Storageと連携するためのフックが用意されています。
 - **Posting restrictions** default to 3 posts/day (reset at JST 2:00) via `EXPO_PUBLIC_DAILY_POST_LIMIT`; setting the var to `0` disables the cap temporarily.
 - **Media handling** uses Expo Camera/Image Picker to fetch an image before category selection.
-- **オンライン食事ルーム**は Zoom への導線として実装。`EXPO_PUBLIC_ZOOM_MEETING_URL` に設定したミーティングへ遷移し、アプリ外でビデオ通話を行います。
+- **オンライン食事ルーム**は BizMee への導線に対応。`EXPO_PUBLIC_BIZMEE_ROOMS` に設定した子カテゴリ別 URL を開き、ブラウザだけでビデオ会話が始められます（アカウント不要）。
 - **My Page** aggregates the last 30 days of history, renders a bar-graph placeholder instead of a pie chart, and exposes the recommendation algorithm from the specs.
 - **Reporting** flows to a dedicated screen where reasons can be selected; collected reports are stored locally for now.
 - **Asset uploads** prefer Supabase Storage (via `@supabase/supabase-js`); if credentials are missing, the code falls back to Firebase Storage, and finally keeps the local URI to avoid breaking the flow.
@@ -82,7 +81,7 @@ The following TypeScript types (see `src/types`) mirror the requirement spec and
 
 | Entity | Fields |
 | ------ | ------ |
-| `User` | `id`, `nickname`, `email`, `miracleMatchPoints`, `createdAt` |
+| `User` | `id`, `nickname`, `email`, `createdAt` |
 | `Post` | `id`, `userId`, `imageUri`, `category`, `parentCategory`, `postedAt`, `expiresAt` |
 | `FoodHistory` | `id`, `userId`, `category`, `parentCategory`, `postedAt` |
 | `Report` | `id`, `reporterId`, `reportedUserId`, `reason`, `createdAt` |
@@ -96,7 +95,7 @@ The following TypeScript types (see `src/types`) mirror the requirement spec and
 Suggested mapping:
 
 - Authentication → `registerWithFirebase`, `loginWithFirebase`, `logoutFromFirebase`
-- Firestore → `createPostDocument`, user profile reads, miracle match updates
+- Firestore → `createPostDocument`, user profile reads
 - Storage → `uploadImageToStorage` for photos
 - Realtime Database / WebRTC → online dining room + one-on-one talking features
 
