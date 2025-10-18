@@ -111,3 +111,148 @@ export const cleanupWaitingPool = functions.region("asia-northeast1").pubsub
     await batch.commit();
     return null;
   });
+
+const ROOMS_COLLECTION = "rooms";
+
+/**
+ * Creates a new room in the `rooms` collection.
+ */
+export const createRoom = functions.region("asia-northeast1").https.onCall(async (data, context) => {
+  const uid = context.auth?.uid;
+  if (!uid) {
+    throw new functions.https.HttpsError("unauthenticated", "User must be logged in to create a room.");
+  }
+
+  const { name, category, bgmUrl } = data;
+  if (!name || !category) {
+    throw new functions.https.HttpsError("invalid-argument", "Room name and category are required.");
+  }
+
+  try {
+    const newRoomRef = db.collection(ROOMS_COLLECTION).doc();
+    await newRoomRef.set({
+      name,
+      category,
+      bgmUrl: bgmUrl || null,
+      participantCount: 1, // The creator is the first participant
+      maxParticipants: 10,
+      createdBy: uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    functions.logger.info(`Room ${newRoomRef.id} created by user ${uid}.`);
+
+    // TODO: If using a 3rd party WebRTC service, create a room on their platform as well.
+
+    return { roomId: newRoomRef.id };
+  } catch (error) {
+    functions.logger.error("Error creating room:", error);
+    throw new functions.https.HttpsError("internal", "Failed to create room.");
+  }
+});
+
+/**
+ * Allows a user to join a room and get an access token for the video call.
+ */
+export const joinRoom = functions.region("asia-northeast1").https.onCall(async (data, context) => {
+  const uid = context.auth?.uid;
+  if (!uid) {
+    throw new functions.https.HttpsError("unauthenticated", "User must be logged in to join a room.");
+  }
+
+  const { roomId } = data;
+  if (!roomId) {
+    throw new functions.https.HttpsError("invalid-argument", "Room ID is required.");
+  }
+
+  const roomRef = db.collection(ROOMS_COLLECTION).doc(roomId);
+
+  try {
+    let accessToken = "";
+    await db.runTransaction(async (transaction) => {
+      const roomDoc = await transaction.get(roomRef);
+      if (!roomDoc.exists) {
+        throw new functions.https.HttpsError("not-found", "The specified room does not exist.");
+      }
+
+      const roomData = roomDoc.data();
+      if (!roomData) {
+        throw new functions.https.HttpsError("internal", "Failed to read room data.");
+      }
+
+      if (roomData.participantCount >= roomData.maxParticipants) {
+        throw new functions.https.HttpsError("resource-exhausted", "The room is full.");
+      }
+
+      transaction.update(roomRef, {
+        participantCount: admin.firestore.FieldValue.increment(1),
+      });
+    });
+
+    functions.logger.info(`User ${uid} joined room ${roomId}.`);
+
+    // TODO: Generate a real access token from your WebRTC service provider (e.g., Agora, Twilio).
+    // This token will authorize the user to join the video call session.
+    accessToken = `fake-token-for-user-${uid}-in-room-${roomId}`;
+
+    return { accessToken };
+  } catch (error) {
+    functions.logger.error(`Error joining room ${roomId} for user ${uid}:`, error);
+    // If the error is one we threw intentionally, rethrow it.
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+    throw new functions.https.HttpsError("internal", "Failed to join the room.");
+  }
+});
+
+
+/**
+ * Handles a user leaving a room. If the room becomes empty, it is deleted.
+ */
+export const leaveRoom = functions.region("asia-northeast1").https.onCall(async (data, context) => {
+  const uid = context.auth?.uid;
+  if (!uid) {
+    throw new functions.https.HttpsError("unauthenticated", "User must be logged in to leave a room.");
+  }
+
+  const { roomId } = data;
+  if (!roomId) {
+    throw new functions.https.HttpsError("invalid-argument", "Room ID is required.");
+  }
+
+  const roomRef = db.collection(ROOMS_COLLECTION).doc(roomId);
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      const roomDoc = await transaction.get(roomRef);
+
+      // If the room doesn't exist, it might have been already deleted.
+      // This is not an error condition.
+      if (!roomDoc.exists) {
+        functions.logger.warn(`User ${uid} tried to leave a non-existent room ${roomId}.`);
+        return;
+      }
+
+      const newParticipantCount = (roomDoc.data()?.participantCount || 1) - 1;
+
+      if (newParticipantCount <= 0) {
+        // If this user is the last one, delete the room.
+        transaction.delete(roomRef);
+        functions.logger.info(`Room ${roomId} is empty and has been deleted.`);
+        // TODO: If using a 3rd party WebRTC service, close the room on their platform.
+      } else {
+        // Otherwise, just decrement the participant count.
+        transaction.update(roomRef, {
+          participantCount: admin.firestore.FieldValue.increment(-1),
+        });
+        functions.logger.info(`User ${uid} left room ${roomId}. New count: ${newParticipantCount}`);
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    functions.logger.error(`Error leaving room ${roomId} for user ${uid}:`, error);
+    throw new functions.https.HttpsError("internal", "Failed to leave the room.");
+  }
+});
