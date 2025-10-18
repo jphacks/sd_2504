@@ -2,10 +2,23 @@
 
 React Native / Expo implementation draft that follows the provided requirements specification for the Co-食 Well-being application. The project currently focuses on an offline-first simulation so that the UX and feature flow can be appreciated before connecting a real backend.
 
+## Team Onboarding (必ず共有)
+
+1. Node.js を `nvm use` で `.nvmrc` (Node 20 LTS) に合わせる  
+2. 依存関係は `npm ci` で再構築（`node_modules/` は Git 管理しない）  
+3. `cp .env.example .env` で環境変数を用意し、Firebase キーなどを記入する  
+4. Expo を起動する際は `npm run start` もしくは `npx expo start`  
+5. うまく動かない場合は `npx expo-doctor` や `npm run start -- --clear` でキャッシュをクリア
+
+Why `npm install`/`npm ci` locally?  
+`package.json` と `package-lock.json` を Git で共有し、各開発者がローカルで依存関係をインストールするのが Node プロジェクトの標準的な運用です。`node_modules/` をコミットしないことで、環境差分が起こっても必要なモジュールを再構築でき、Expo のローカル CLI も自動的に導入されます。
+
+チーム全体のワークフローや PR テンプレート案など、詳細な運用手順は `docs/team-setup.md` を参照してください。
+
 ## Getting Started
 
 ```bash
-npm install
+npm ci
 npm run ios   # or npm run android / npm run web
 ```
 

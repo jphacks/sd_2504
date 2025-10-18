@@ -38,15 +38,29 @@ import { User, Post } from '../types';
 import { getSupabaseClient, getSupabaseBucket } from './supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const requireEnv = (name: string) => {
-  const value = process.env[name];
+type FirebaseRequiredKey =
+  | 'EXPO_PUBLIC_FIREBASE_API_KEY'
+  | 'EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN'
+  | 'EXPO_PUBLIC_FIREBASE_PROJECT_ID'
+  | 'EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'
+  | 'EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'
+  | 'EXPO_PUBLIC_FIREBASE_APP_ID';
+
+type FirebaseOptionalKey = 'EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID';
+
+const requireEnv = (key: FirebaseRequiredKey): string => {
+  const value = process.env[key];
   if (!value) {
-    throw new Error(`Environment variable ${name} is not set`);
+    throw new Error(`Missing required environment variable: ${key}`);
   }
   return value;
 };
 
-// Read Firebase configuration from environment variables so secrets are not hard-coded.
+const optionalEnv = (key: FirebaseOptionalKey): string | undefined => {
+  return process.env[key];
+};
+
+// Firebase configuration is resolved from Expo public environment variables.
 export const firebaseConfig = {
   apiKey: requireEnv('EXPO_PUBLIC_FIREBASE_API_KEY'),
   authDomain: requireEnv('EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN'),
@@ -54,7 +68,8 @@ export const firebaseConfig = {
   storageBucket: requireEnv('EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET'),
   messagingSenderId: requireEnv('EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'),
   appId: requireEnv('EXPO_PUBLIC_FIREBASE_APP_ID'),
-  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  // 任意（未設定なら undefined のままでOK）
+  measurementId: optionalEnv('EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID'),
 };
 
 let firebaseApp: FirebaseApp | null = null;
