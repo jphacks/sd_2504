@@ -25,10 +25,4 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
     title: 'オンライン食卓を楽しむ',
     description: '投稿後1時間はオンライン食卓ルームや一食トークでリアルタイムに交流できます。',
   },
-  {
-    id: '5',
-    title: 'Miracle Matchを狙おう',
-    description: '同じカテゴリでマッチングするとポイント獲得。マイページで振り返りを楽しんでください。',
-  },
 ];
-
