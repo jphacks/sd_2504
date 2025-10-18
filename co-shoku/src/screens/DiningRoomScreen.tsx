@@ -1,25 +1,22 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useMemo, useState } from 'react';
-import { Image, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { useAppContext } from '../context/AppContext';
 import { DINING_ROOM_TRACKS } from '../constants/bgm';
 import { MainStackParamList } from '../navigation/AppNavigator';
-import { Post } from '../types';
-
-const findActivePost = (posts: Post[]): Post | undefined =>
-  posts.find((post) => new Date(post.expiresAt).getTime() > Date.now());
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DiningRoom'>;
 
+const zoomMeetingUrl = process.env.EXPO_PUBLIC_ZOOM_MEETING_URL ?? '';
+const zoomFallbackUrl = process.env.EXPO_PUBLIC_ZOOM_WEB_URL ?? '';
+
 export const DiningRoomScreen = ({ navigation }: Props) => {
-  const { posts } = useAppContext();
-  const [cameraOn, setCameraOn] = useState(true);
+  const { user } = useAppContext();
   const [entered, setEntered] = useState(false);
   const [trackId, setTrackId] = useState<string>();
-
-  const activePost = useMemo(() => findActivePost(posts), [posts]);
 
   useEffect(() => {
     setEntered(true);
@@ -32,38 +29,75 @@ export const DiningRoomScreen = ({ navigation }: Props) => {
     return DINING_ROOM_TRACKS.find((track) => track.id === trackId)?.title ?? 'BGM 選択中';
   }, [trackId]);
 
+  const handleJoinZoom = async () => {
+    const urlCandidates = [zoomMeetingUrl, zoomFallbackUrl].filter(Boolean);
+    if (urlCandidates.length === 0) {
+      Alert.alert('Zoomリンクが設定されていません', '運営にお問い合わせください。');
+      return;
+    }
+
+    for (const url of urlCandidates) {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+        return;
+      }
+    }
+
+    Alert.alert(
+      'Zoomを開けませんでした',
+      'Zoomアプリがインストールされているか、ブラウザで開けるリンクかをご確認ください。'
+    );
+  };
+
   return (
     <ScreenContainer>
       <View style={styles.container}>
         <Text style={styles.title}>オンライン食事ルーム</Text>
-        <Text style={styles.subtitle}>BGM を聴きながら食事を楽しみましょう。</Text>
+        <Text style={styles.subtitle}>
+          Zoom を使って気軽に一緒に食事を楽しみましょう。投稿から1時間は何度でも参加できます。
+        </Text>
 
         <View style={styles.statusCard}>
-          <Text style={styles.statusText}>{entered ? 'いただきます（自動送信）' : '接続中...'}</Text>
-          <Text style={styles.statusSub}>退室時には「ごちそうさま」が自動送信されます。</Text>
+          <Text style={styles.statusText}>
+            {entered ? `こんにちは、${user?.nickname ?? 'ゲスト'}さん` : '接続準備中…'}
+          </Text>
+          <Text style={styles.statusSub}>
+            Zoom に参加すると「いただきます」メッセージが自動で送信され、退室時には「ごちそうさま」が表示されます。
+          </Text>
         </View>
 
         <View style={styles.bgmCard}>
-          <Text style={styles.sectionTitle}>再生中のBGM</Text>
+          <Text style={styles.sectionTitle}>おすすめBGM</Text>
           <Text style={styles.bgmTitle}>{trackTitle}</Text>
-          <Text style={styles.bgmSub}>楽曲はランダムで選択されます。</Text>
+          <Text style={styles.bgmSub}>Zoomと同時に流すと、食卓の雰囲気がより明るくなります。</Text>
         </View>
 
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>カメラ</Text>
-          <Switch value={cameraOn} onValueChange={setCameraOn} thumbColor={cameraOn ? '#FF7F50' : '#ccc'} />
+        <View style={styles.instructions}>
+          <Text style={styles.instructionsTitle}>参加方法</Text>
+          <Text style={styles.instructionsText}>1. 下のボタンをタップして Zoom を開きます。</Text>
+          <Text style={styles.instructionsText}>2. Zoom アプリまたはブラウザでミーティングに参加します。</Text>
+          <Text style={styles.instructionsText}>3. カメラやマイク設定は Zoom 内で調整できます。</Text>
         </View>
 
-        {!cameraOn && activePost?.imageUri && (
-          <View style={styles.preview}>
-            <Text style={styles.previewLabel}>カメラOFF時は投稿写真を表示</Text>
-            <Image source={{ uri: activePost.imageUri }} style={styles.previewImage} />
+        <PrimaryButton title="Zoom に参加する" onPress={handleJoinZoom} />
+
+        {zoomMeetingUrl ? (
+          <View style={styles.noticeBox}>
+            <Text style={styles.noticeLabel}>参加リンク</Text>
+            <Text style={styles.noticeLink}>{zoomMeetingUrl}</Text>
+            <Text style={styles.noticeSub}>開けない場合はリンクをコピーしてブラウザからアクセスしてください。</Text>
+          </View>
+        ) : (
+          <View style={styles.noticeBox}>
+            <Text style={styles.noticeLabel}>リンク未設定</Text>
+            <Text style={styles.noticeSub}>運営で Zoom ミーティング URL を設定すると参加できるようになります。</Text>
           </View>
         )}
 
         <View style={styles.footer}>
-          <SecondaryButton title="退室する" onPress={() => navigation.goBack()} />
-          <Text style={styles.notice}>利用時間は投稿から1時間までです。</Text>
+          <SecondaryButton title="ホームに戻る" onPress={() => navigation.goBack()} />
+          <Text style={styles.footerText}>利用時間は投稿から1時間までです。</Text>
         </View>
       </View>
     </ScreenContainer>
@@ -89,15 +123,16 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
+    gap: 8,
   },
   statusText: {
     fontSize: 16,
     fontWeight: '600',
   },
   statusSub: {
-    marginTop: 6,
     fontSize: 12,
     color: '#444',
+    lineHeight: 18,
   },
   bgmCard: {
     backgroundColor: '#fff',
@@ -125,36 +160,56 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 6,
   },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
+  instructions: {
+    backgroundColor: '#FFF2EB',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
   },
-  toggleLabel: {
+  instructionsTitle: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  preview: {
-    marginTop: 12,
-  },
-  previewLabel: {
-    fontSize: 12,
-    color: '#555',
     marginBottom: 8,
   },
-  previewImage: {
-    width: '100%',
-    height: 200,
+  instructionsText: {
+    fontSize: 14,
+    color: '#444',
+    marginBottom: 6,
+  },
+  noticeBox: {
+    backgroundColor: '#fff',
     borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+    marginTop: 16,
+  },
+  noticeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF7F50',
+    marginBottom: 6,
+  },
+  noticeLink: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 6,
+  },
+  noticeSub: {
+    fontSize: 12,
+    color: '#777',
   },
   footer: {
     marginTop: 'auto',
     alignItems: 'center',
   },
-  notice: {
+  footerText: {
     fontSize: 12,
     color: '#777',
     marginTop: 8,
   },
 });
+

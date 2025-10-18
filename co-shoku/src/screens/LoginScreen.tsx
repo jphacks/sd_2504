@@ -6,6 +6,7 @@ import { ScreenContainer } from '../components/ScreenContainer';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { useAppContext } from '../context/AppContext';
 import { AuthStackParamList } from '../navigation/AppNavigator';
+import { getAuthErrorMessage } from '../utils/firebaseErrors';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -21,8 +22,9 @@ export const LoginScreen = ({ navigation }: Props) => {
     }
     try {
       await login({ email, password });
-    } catch (error) {
-      Alert.alert('ログインに失敗しました', 'もう一度お試しください。');
+    } catch (error: unknown) {
+      const code = (error as { code?: string })?.code;
+      Alert.alert('ログインに失敗しました', getAuthErrorMessage(code));
     }
   };
 
@@ -91,4 +93,3 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 });
-
