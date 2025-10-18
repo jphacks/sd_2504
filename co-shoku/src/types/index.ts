@@ -2,7 +2,6 @@ export type User = {
   id: string;
   nickname: string;
   email: string;
-  miracleMatchPoints: number;
   createdAt: string;
 };
 
@@ -34,6 +33,4 @@ export type Report = {
 
 export type CallMatch = {
   partnerCategory: string;
-  miracleMatch: boolean;
 };
-

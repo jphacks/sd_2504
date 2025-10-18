@@ -160,7 +160,6 @@ const mapFirebaseUserToAppUser = async (firebaseUser: FirebaseUser): Promise<Use
       id: firebaseUser.uid,
       nickname: data.nickname,
       email: firebaseUser.email ?? '',
-      miracleMatchPoints: data.miracleMatchPoints ?? 0,
       createdAt: data.createdAt ?? new Date().toISOString(),
     };
   }
@@ -170,13 +169,11 @@ const mapFirebaseUserToAppUser = async (firebaseUser: FirebaseUser): Promise<Use
     id: firebaseUser.uid,
     nickname: firebaseUser.displayName ?? 'ユーザー',
     email: firebaseUser.email ?? '',
-    miracleMatchPoints: 0,
     createdAt: firebaseUser.metadata.creationTime ?? new Date().toISOString(),
   };
   await setDoc(userDocRef, {
     nickname: fallbackUser.nickname,
     email: fallbackUser.email,
-    miracleMatchPoints: fallbackUser.miracleMatchPoints,
     createdAt: fallbackUser.createdAt,
   });
   return fallbackUser;
@@ -205,7 +202,6 @@ export const registerWithFirebase = async (email: string, password: string, nick
     id: credential.user.uid,
     nickname,
     email,
-    miracleMatchPoints: 0,
     createdAt: new Date().toISOString(),
   };
 
@@ -213,7 +209,6 @@ export const registerWithFirebase = async (email: string, password: string, nick
   await setDoc(doc(db, USERS_COLLECTION, credential.user.uid), {
     nickname,
     email,
-    miracleMatchPoints: 0,
     createdAt: userData.createdAt,
   });
 
@@ -349,15 +344,4 @@ export const getFoodHistoryForUser = async (userId: string) => {
       postedAt: data.postedAt,
     };
   });
-};
-
-export const incrementUserMiraclePoints = async (userId: string, amount = 1) => {
-  const db = getFirebaseFirestore();
-  await setDoc(
-    doc(db, USERS_COLLECTION, userId),
-    {
-      miracleMatchPoints: increment(amount),
-    },
-    { merge: true }
-  );
 };

@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
@@ -13,18 +13,10 @@ const findActivePost = (posts: Post[]): Post | undefined =>
   posts.find((post) => new Date(post.expiresAt).getTime() > Date.now());
 
 export const CallSessionScreen = ({ route, navigation }: Props) => {
-  const { partnerCategory, miracleMatch } = route.params;
-  const { posts, addMiracleMatchPoint } = useAppContext();
-  const hasRewardedRef = useRef(false);
+  const { partnerCategory } = route.params;
+  const { posts } = useAppContext();
 
   const activePost = useMemo(() => findActivePost(posts), [posts]);
-
-  useEffect(() => {
-    if (miracleMatch && !hasRewardedRef.current) {
-      addMiracleMatchPoint();
-      hasRewardedRef.current = true;
-    }
-  }, [addMiracleMatchPoint, miracleMatch]);
 
   return (
     <ScreenContainer>
@@ -32,8 +24,6 @@ export const CallSessionScreen = ({ route, navigation }: Props) => {
         <Text style={styles.title}>一食トーク中</Text>
         <Text style={styles.subtitle}>投稿カテゴリ: {activePost?.category ?? '未設定'}</Text>
         <Text style={styles.subtitle}>相手の投稿カテゴリ: {partnerCategory}</Text>
-
-        {miracleMatch && <Text style={styles.miracle}>Miracle Match!! +1 ポイント獲得</Text>}
 
         <View style={styles.videoContainer}>
           <View style={styles.videoBox}>
@@ -65,12 +55,6 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 6,
   },
-  miracle: {
-    marginTop: 12,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FF7F50',
-  },
   videoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -95,4 +79,3 @@ const styles = StyleSheet.create({
     color: '#777',
   },
 });
-

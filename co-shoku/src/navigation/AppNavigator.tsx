@@ -29,7 +29,7 @@ export type MainStackParamList = {
   Timeline: { category: string };
   DiningRoom: undefined;
   CallWaiting: undefined;
-  CallSession: { partnerCategory: string; miracleMatch: boolean };
+  CallSession: { partnerCategory: string };
   Report: { reportedUserId?: string };
 };
 
@@ -114,4 +114,3 @@ export const AppNavigator = () => {
 
   return <NavigationContainer>{content}</NavigationContainer>;
 };
-

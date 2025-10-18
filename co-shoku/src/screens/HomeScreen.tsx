@@ -49,14 +49,6 @@ export const HomeScreen = ({ navigation }: Props) => {
     navigation.navigate('DiningRoom');
   };
 
-  const handleNavigateCall = () => {
-    if (!isUnlockActive) {
-      Alert.alert('利用できません', '写真を投稿すると1時間限定で利用できます。');
-      return;
-    }
-    navigation.navigate('CallWaiting');
-  };
-
   return (
     <ScreenContainer>
       <View style={styles.header}>
@@ -92,13 +84,12 @@ export const HomeScreen = ({ navigation }: Props) => {
           </Text>
         ) : (
           <Text style={styles.lockedInfo}>
-            写真を投稿すると1時間限定でタイムライン・オンライン食卓・一食トークを利用できます。
+            写真を投稿すると1時間限定でタイムラインとオンライン食卓ルームを利用できます。
           </Text>
         )}
 
         <PrimaryButton title="タイムラインを見る" onPress={handleNavigateTimeline} disabled={!isUnlockActive} />
         <PrimaryButton title="オンライン食事ルームへ" onPress={handleNavigateDiningRoom} disabled={!isUnlockActive} />
-        <PrimaryButton title="一食トークを開始" onPress={handleNavigateCall} disabled={!isUnlockActive} />
       </View>
 
       <View style={styles.section}>
