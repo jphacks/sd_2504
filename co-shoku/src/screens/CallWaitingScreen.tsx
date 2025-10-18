@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
@@ -14,11 +14,8 @@ const findLatestActivePost = (posts: Post[]): Post | undefined =>
   posts.find((post) => new Date(post.expiresAt).getTime() > Date.now());
 
 export const CallWaitingScreen = ({ navigation }: Props) => {
-  const { posts, availableChildCategories } = useAppContext();
-  const [waiting, setWaiting] = useState(true);
-  const [timedOut, setTimedOut] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const matchRef = useRef<NodeJS.Timeout | null>(null);
+  const { posts, startMatchmaking, listenForMatch, cancelMatchmaking } = useAppContext();
+  const [status, setStatus] = useState('waiting'); // waiting, matched, timed_out
 
   const activePost = useMemo(() => findLatestActivePost(posts), [posts]);
   const currentCategory = activePost?.category;
@@ -31,33 +28,47 @@ export const CallWaitingScreen = ({ navigation }: Props) => {
       return;
     }
 
-    timeoutRef.current = setTimeout(() => {
-      setWaiting(false);
-      setTimedOut(true);
-    }, 60 * 1000);
+    startMatchmaking(currentCategory).catch((err) => {
+      console.error('Failed to start matchmaking', err);
+      Alert.alert('エラー', 'マッチングを開始できませんでした。');
+      navigation.goBack();
+    });
 
-    matchRef.current = setTimeout(() => {
-      const shouldMiracle = Math.random() < 0.4;
-      const partnerCategory = shouldMiracle
-        ? currentCategory
-        : availableChildCategories[Math.floor(Math.random() * availableChildCategories.length)];
-      navigation.replace('CallSession', {
-        partnerCategory,
-        miracleMatch: partnerCategory === currentCategory,
-      });
-    }, 3000 + Math.random() * 4000);
+    const unsubscribe = listenForMatch(async (newStatus, matchData) => {
+      setStatus(newStatus);
+      if (newStatus === 'matched' && matchData) {
+        const partnerCategory = matchData.participants.find(p => p.category !== currentCategory)?.category ?? currentCategory;
+        navigation.replace('CallSession', {
+          partnerCategory,
+          miracleMatch: matchData.isMiracleMatch,
+        });
+      }
+    });
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-      if (matchRef.current) {
-        clearTimeout(matchRef.current);
-        matchRef.current = null;
+      unsubscribe();
+      // Only cancel if the user is still in the waiting pool
+      if (status === 'waiting') {
+        cancelMatchmaking().catch(err => console.warn('Failed to cancel matchmaking', err));
       }
     };
-  }, [availableChildCategories, currentCategory, navigation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCategory]);
+
+  const handleCancel = () => {
+    navigation.goBack();
+  };
+
+  const handleRetry = () => {
+    setStatus('waiting');
+    if (currentCategory) {
+      startMatchmaking(currentCategory).catch((err) => {
+        console.error('Failed to restart matchmaking', err);
+        Alert.alert('エラー', 'マッチングを再開できませんでした。');
+        navigation.goBack();
+      });
+    }
+  };
 
   return (
     <ScreenContainer>
@@ -67,19 +78,21 @@ export const CallWaitingScreen = ({ navigation }: Props) => {
           匿名でマッチングします。投稿カテゴリ: {currentCategory ?? '未設定'}
         </Text>
 
-        {waiting && !timedOut ? (
+        {status === 'waiting' && (
           <View style={styles.waiting}>
             <ActivityIndicator size="large" color="#FF7F50" />
             <Text style={styles.waitingText}>お相手を探しています...</Text>
           </View>
-        ) : timedOut ? (
-          <View style={styles.waiting}>
-            <Text style={styles.waitingText}>1分以内にマッチしませんでした。</Text>
-            <SecondaryButton title="もう一度探す" onPress={() => navigation.replace('CallWaiting')} />
-          </View>
-        ) : null}
+        )}
 
-        <PrimaryButton title="キャンセル" onPress={() => navigation.goBack()} />
+        {status === 'timed_out' && (
+          <View style={styles.waiting}>
+            <Text style={styles.waitingText}>マッチングしませんでした。</Text>
+            <SecondaryButton title="もう一度探す" onPress={handleRetry} />
+          </View>
+        )}
+
+        <PrimaryButton title="キャンセル" onPress={handleCancel} />
       </View>
     </ScreenContainer>
   );
