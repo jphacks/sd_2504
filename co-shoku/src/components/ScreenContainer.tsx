@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Props = {
   children: ReactNode;
@@ -22,4 +23,3 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
 });
-
