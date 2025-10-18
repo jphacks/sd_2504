@@ -40,11 +40,15 @@ EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 EXPO_PUBLIC_FIREBASE_APP_ID=...
 EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=...
 EXPO_PUBLIC_DAILY_POST_LIMIT=3
+EXPO_PUBLIC_ZOOM_MEETING_URL=https://zoom.us/j/xxxxxxxxxx?pwd=yyyy
+# (optional) ブラウザ用リンクを別で設定したい場合
+EXPO_PUBLIC_ZOOM_WEB_URL=https://zoom.us/j/xxxxxxxxxx
 ```
 
 > Note: `EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET` defaults to `posts` when omitted.  
 > Firebase keys are required at build time; measurementId is optional if Analytics is disabled.  
-> Set `EXPO_PUBLIC_DAILY_POST_LIMIT` to `0` (or omit it) for unlimited daily postings during development.
+> Set `EXPO_PUBLIC_DAILY_POST_LIMIT` to `0` (or omit it) for unlimited daily postings during development.  
+> `EXPO_PUBLIC_ZOOM_WEB_URL` を設定すると、Zoom アプリが起動できない場合のブラウザURLとして利用されます。
 
 ## Project Structure
 
@@ -67,7 +71,7 @@ co-shoku/
 - **App state** lives in `AppContext`, which simulates authentication, posting, unlock windows, miracle match scoring, and food history aggregation. This is the primary point to integrate Firebase Authentication, Firestore, Storage, and Realtime Database calls.
 - **Posting restrictions** default to 3 posts/day (reset at JST 2:00) via `EXPO_PUBLIC_DAILY_POST_LIMIT`; setting the var to `0` disables the cap temporarily.
 - **Media handling** uses Expo Camera/Image Picker to fetch an image before category selection.
-- **Realtime features** (timeline, dining room, one-on-one talk) are stubbed with deterministic UI to make UX reviews possible until WebRTC / Realtime DB plumbing is wired.
+- **オンライン食事ルーム**は Zoom への導線として実装。`EXPO_PUBLIC_ZOOM_MEETING_URL` に設定したミーティングへ遷移し、アプリ外でビデオ通話を行います。
 - **My Page** aggregates the last 30 days of history, renders a bar-graph placeholder instead of a pie chart, and exposes the recommendation algorithm from the specs.
 - **Reporting** flows to a dedicated screen where reasons can be selected; collected reports are stored locally for now.
 - **Asset uploads** prefer Supabase Storage (via `@supabase/supabase-js`); if credentials are missing, the code falls back to Firebase Storage, and finally keeps the local URI to avoid breaking the flow.
@@ -101,5 +105,5 @@ Suggested mapping:
 1. Replace context stubs with production-grade Firebase implementations and persist auth state (e.g., SecureStore).
 2. Swap the My Page placeholder bar chart for a proper pie chart using `react-native-svg`/`victory-native` or Recharts.
 3. Implement real timeline feeds and presence with Firestore queries and Realtime Database subscriptions.
-4. Integrate WebRTC (e.g., `react-native-webrtc`) for video streams in dining / call screens.
+4.（任意）Zoom Meeting SDK や WebRTC を導入してアプリ内での映像共有に発展させる。
 5. Harden permission handling, add analytics, and prepare production builds for iOS/Android.
