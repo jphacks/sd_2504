@@ -24,6 +24,18 @@ npm run ios   # or npm run android / npm run web
 
 The app relies on Expo modules for navigation, camera access, and AV playback. Ensure the Expo CLI is installed globally or use `npx expo`.
 
+### Environment Variables
+
+Create an `.env` (or use `app.config.js`) with the following variables so Storage uploads can reach Supabase and Firebase knows your project IDs.
+
+```
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET=posts
+```
+
+> Note: `EXPO_PUBLIC_SUPABASE_STORAGE_BUCKET` defaults to `posts` when omitted.
+
 ## Project Structure
 
 ```
@@ -48,6 +60,7 @@ co-shoku/
 - **Realtime features** (timeline, dining room, one-on-one talk) are stubbed with deterministic UI to make UX reviews possible until WebRTC / Realtime DB plumbing is wired.
 - **My Page** aggregates the last 30 days of history, renders a bar-graph placeholder instead of a pie chart, and exposes the recommendation algorithm from the specs.
 - **Reporting** flows to a dedicated screen where reasons can be selected; collected reports are stored locally for now.
+- **Asset uploads** prefer Supabase Storage (via `@supabase/supabase-js`); if credentials are missing, the code falls back to Firebase Storage, and finally keeps the local URI to avoid breaking the flow.
 
 ### Data Model Overview
 

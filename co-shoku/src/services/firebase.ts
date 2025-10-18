@@ -34,6 +34,7 @@ import {
   type FirebaseStorage,
 } from 'firebase/storage';
 import { User, Post } from '../types';
+import { getSupabaseClient, getSupabaseBucket } from './supabase';
 
 type FirebaseEnvKey =
   | 'EXPO_PUBLIC_FIREBASE_API_KEY'
@@ -209,17 +210,49 @@ const uriToBlob = async (uri: string): Promise<Blob> => {
   return blob;
 };
 
+const fetchImageAsUint8Array = async (uri: string): Promise<Uint8Array> => {
+  const response = await fetch(uri);
+  const arrayBuffer = await response.arrayBuffer();
+  return new Uint8Array(arrayBuffer);
+};
+
 const generateImageRef = (storage: FirebaseStorage, userId: string): StorageReference => {
   const fileName = `posts/${userId}/${Date.now()}.jpg`;
   return ref(storage, fileName);
 };
 
 export const uploadImageToStorage = async (uri: string, userId: string): Promise<string> => {
-  const storage = getFirebaseStorage();
-  const storageRef = generateImageRef(storage, userId);
-  const blob = await uriToBlob(uri);
-  await uploadBytes(storageRef, blob);
-  return getDownloadURL(storageRef);
+  try {
+    const supabase = getSupabaseClient();
+    const bucket = getSupabaseBucket();
+    const supabasePath = `posts/${userId}/${Date.now()}.jpg`;
+    const fileBytes = await fetchImageAsUint8Array(uri);
+    const { error } = await supabase.storage.from(bucket).upload(supabasePath, fileBytes, {
+      contentType: 'image/jpeg',
+      upsert: false,
+    });
+    if (error) {
+      throw error;
+    }
+    const { data } = supabase.storage.from(bucket).getPublicUrl(supabasePath);
+    if (!data?.publicUrl) {
+      throw new Error('Failed to obtain Supabase public URL');
+    }
+    return data.publicUrl;
+  } catch (supabaseError) {
+    console.warn('Supabase Storage upload failed. Falling back to Firebase Storage.', supabaseError);
+  }
+
+  try {
+    const storage = getFirebaseStorage();
+    const storageRef = generateImageRef(storage, userId);
+    const blob = await uriToBlob(uri);
+    await uploadBytes(storageRef, blob);
+    return getDownloadURL(storageRef);
+  } catch (firebaseError) {
+    console.warn('Firebase Storage fallback upload failed. Returning local URI.', firebaseError);
+    return uri;
+  }
 };
 
 type PostDocument = {
