@@ -23,7 +23,9 @@ import {
   getTimelineDocuments,
   getFoodHistoryForUser,
   incrementUserMiraclePoints,
+  getFirebaseFirestore,
 } from '../services/firebase';
+import { doc, setDoc, serverTimestamp, onSnapshot, deleteDoc, getDoc } from 'firebase/firestore';
 
 type Credentials = {
   email: string;
