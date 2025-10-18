@@ -20,6 +20,7 @@ export const HomeScreen = ({ navigation }: Props) => {
     canPostToday,
     dailyPostCount,
     maxDailyPosts,
+    isDailyPostLimitEnabled,
     isUnlockActive,
     minutesUntilLockout,
     posts,
@@ -28,6 +29,9 @@ export const HomeScreen = ({ navigation }: Props) => {
 
   const activePost = useMemo(() => getActivePost(posts), [posts]);
   const currentCategory = activePost?.category;
+  const postCountLabel = isDailyPostLimitEnabled
+    ? `${dailyPostCount} / ${maxDailyPosts}`
+    : `${dailyPostCount}（制限なし）`;
 
   const handleNavigateTimeline = () => {
     if (!currentCategory) {
@@ -58,20 +62,24 @@ export const HomeScreen = ({ navigation }: Props) => {
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>こんにちは、{user?.nickname ?? 'ゲスト'}さん</Text>
-          <Text style={styles.sub}>今日の投稿数: {dailyPostCount} / {maxDailyPosts}</Text>
+          <Text style={styles.sub}>今日の投稿数: {postCountLabel}</Text>
         </View>
         <SecondaryButton title="ログアウト" onPress={logout} />
       </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>写真を投稿</Text>
-        <Text style={styles.cardText}>料理写真を1日3回まで投稿できます。投稿すると1時間限定で各機能が解放されます。</Text>
+        <Text style={styles.cardText}>
+          {isDailyPostLimitEnabled
+            ? `料理写真を1日${maxDailyPosts}回まで投稿できます。投稿すると1時間限定で各機能が解放されます。`
+            : '料理写真を好きなだけ投稿できます。投稿すると1時間限定で各機能が解放されます。'}
+        </Text>
         <PrimaryButton
           title={canPostToday ? '投稿する' : '本日の投稿は完了'}
           onPress={() => navigation.navigate('PostCapture')}
           disabled={!canPostToday}
         />
-        {!canPostToday && (
+        {isDailyPostLimitEnabled && !canPostToday && (
           <Text style={styles.notice}>リセットは毎日午前2時（JST）です。</Text>
         )}
       </View>
@@ -170,4 +178,3 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
-
