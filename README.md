@@ -2,6 +2,8 @@
 
 ![image](https://github.com/jphacks/sd_2504/blob/ryoma/docs/assets/co-shoku.png)
 
+デモ動画：https://youtu.be/MeG0UPHoFsA
+
 
 ## 製品概要
 ### 背景（製品開発のきっかけ、課題等）
