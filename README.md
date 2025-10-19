@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="docs/assets/co-shoku-hero.png" alt="Co-食のロゴと『今これ食べてる！』で繋がろう" width="720">
-</p>
+![Co-食のロゴと『今これ食べてる！』で繋がろう](docs/assets/co-shoku.png)
 
 # Co-食
 
