@@ -33,12 +33,18 @@
 ## 開発技術
 ### 活用した技術
 #### API・データ
+##### Firebase
 * Firebase Authentication API
-* Cloud Firestore API 
-* Firebase Cloud Storage API 
-* Firebase Analytics API 
-* Cloud Functions for Firebase (Firestore trigger & HTTPS callable API) 
+* Cloud Firestore API
+* Firebase Cloud Storage API
+* Firebase Analytics API
+* Cloud Functions for Firebase（Firestore Trigger / HTTPS Callable）
+
+##### Supabase
 * Supabase Storage API
+
+##### 外部サービス
+* BizMee ルーム URL（カテゴリ別オンライン食卓リンク）
 
 #### フレームワーク・ライブラリ・モジュール
 * Expo (React Native, React 19)
