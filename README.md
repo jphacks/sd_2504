@@ -1,6 +1,6 @@
 # Co-食
 
-![image](![image](https://github.com/jphacks/sd_2504/blob/ryoma/docs/assets/co-shoku.png)
+![image](https://github.com/jphacks/sd_2504/blob/ryoma/docs/assets/co-shoku.png)
 
 
 ## 製品概要
