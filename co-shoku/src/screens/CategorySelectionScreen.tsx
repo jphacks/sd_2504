@@ -38,8 +38,8 @@ export const CategorySelectionScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <ScreenContainer>
-      <ScrollView>
+    <ScreenContainer includeTopInset={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>カテゴリを選択してください</Text>
         <Text style={styles.subtitle}>投稿カテゴリに応じて利用できるタイムラインが決まります。</Text>
 
@@ -68,6 +68,12 @@ export const CategorySelectionScreen = ({ route, navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  scroll: {
+    marginHorizontal: -20,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+  },
   title: {
     fontSize: 22,
     fontWeight: '700',

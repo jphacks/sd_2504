@@ -23,7 +23,7 @@ export const ReportScreen = ({ route, navigation }: Props) => {
   };
 
   return (
-    <ScreenContainer>
+    <ScreenContainer includeTopInset={false}>
       <View style={styles.container}>
         <Text style={styles.title}>通報する理由を選択してください</Text>
         {REPORT_REASONS.map((reason) => (

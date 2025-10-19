@@ -20,7 +20,7 @@ export const TimelineScreen = ({ route, navigation }: Props) => {
   const posts = useMemo(() => getTimelineForCategory(category), [category, getTimelineForCategory]);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer includeTopInset={false}>
       <View style={styles.header}>
         <Text style={styles.title}>{category} のタイムライン</Text>
         <Text style={styles.subtitle}>投稿は1時間で自動削除されます。</Text>

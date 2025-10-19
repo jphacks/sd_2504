@@ -52,7 +52,7 @@ export const DiningRoomScreen = ({ navigation }: Props) => {
     : '写真を投稿すると1時間ご利用いただけます。';
 
   return (
-    <ScreenContainer>
+    <ScreenContainer includeTopInset={false}>
       <View style={styles.container}>
         <Text style={styles.title}>わいわい食堂</Text>
         <Text style={styles.subtitle}>
@@ -76,9 +76,16 @@ export const DiningRoomScreen = ({ navigation }: Props) => {
         )}
 
         <View style={styles.suggestionBox}>
-          <Text style={styles.suggestionTitle}>会話の種
-          </Text>
-          <Text style={styles.suggestionText}>{suggestionText}</Text>
+          <Text style={styles.suggestionTitle}>会話の種</Text>
+          <View style={styles.suggestionBubble}>
+            <View style={styles.suggestionPanel}>
+              <Text style={styles.suggestionText}>{suggestionText}</Text>
+              <Text style={styles.suggestionFooter}>今日の話題カードをきっかけに気軽に話しかけてみましょう。</Text>
+            </View>
+            <View style={styles.suggestionTail}>
+              <View style={styles.suggestionTailInner} />
+            </View>
+          </View>
         </View>
 
         <PrimaryButton
@@ -208,15 +215,57 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   suggestionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
     color: '#3F51B5',
-    marginBottom: 6,
+    marginBottom: 12,
+  },
+  suggestionBubble: {
+    position: 'relative',
+    paddingBottom: 16,
+  },
+  suggestionPanel: {
+    backgroundColor: '#F4F6FF',
+    borderRadius: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    borderWidth: 2,
+    borderColor: '#3F51B5',
+    shadowColor: '#3F51B5',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
   suggestionText: {
-    fontSize: 13,
+    fontSize: 16,
     color: '#333',
-    lineHeight: 18,
+    lineHeight: 24,
+    fontWeight: '600',
+  },
+  suggestionFooter: {
+    fontSize: 12,
+    color: '#6F7DBF',
+    marginTop: 10,
+  },
+  suggestionTail: {
+    position: 'absolute',
+    bottom: 0,
+    left: 32,
+    width: 22,
+    height: 12,
+    transform: [{ translateY: 6 }],
+  },
+  suggestionTailInner: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#F4F6FF',
+    borderLeftWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: '#3F51B5',
+    transform: [{ rotate: '45deg' }],
+    borderBottomLeftRadius: 4,
   },
   footer: {
     marginTop: 'auto',

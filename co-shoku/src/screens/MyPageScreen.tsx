@@ -64,8 +64,8 @@ export const MyPageScreen = (_props: Props) => {
   const suggestion = useMemo(() => pickSuggestion(foodHistory), [foodHistory]);
 
   return (
-    <ScreenContainer>
-      <ScrollView>
+    <ScreenContainer includeTopInset={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <View style={styles.section}>
           <Text style={styles.title}>{user?.nickname ?? 'ユーザー'}さんのマイページ</Text>
         </View>
@@ -125,6 +125,12 @@ export const MyPageScreen = (_props: Props) => {
 };
 
 const styles = StyleSheet.create({
+  scroll: {
+    marginHorizontal: -20,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+  },
   section: {
     marginBottom: 24,
   },
