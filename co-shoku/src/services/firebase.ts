@@ -22,7 +22,6 @@ import {
   orderBy,
   limit,
   getDocs,
-  increment,
   type Firestore,
   type DocumentData,
 } from 'firebase/firestore';
