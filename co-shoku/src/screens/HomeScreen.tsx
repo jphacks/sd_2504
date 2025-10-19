@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
@@ -23,9 +23,31 @@ export const HomeScreen = ({ navigation }: Props) => {
     isDailyPostLimitEnabled,
     isUnlockActive,
     minutesUntilLockout,
+    unlockUntil,
     posts,
     hasPostedOnce,
   } = useAppContext();
+
+  const calculateRemainingMinutes = (timestamp?: string | null) => {
+    if (!timestamp) {
+      return 0;
+    }
+    const diff = new Date(timestamp).getTime() - Date.now();
+    return diff > 0 ? Math.ceil(diff / (60 * 1000)) : 0;
+  };
+
+  const [remainingMinutes, setRemainingMinutes] = useState(() => calculateRemainingMinutes(unlockUntil));
+
+  useEffect(() => {
+    setRemainingMinutes(calculateRemainingMinutes(unlockUntil));
+    if (!unlockUntil) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setRemainingMinutes(calculateRemainingMinutes(unlockUntil));
+    }, 30 * 1000);
+    return () => clearInterval(interval);
+  }, [unlockUntil]);
 
   const activePost = useMemo(() => getActivePost(posts), [posts]);
   const currentCategory = activePost?.category;
@@ -80,7 +102,7 @@ export const HomeScreen = ({ navigation }: Props) => {
         <Text style={styles.sectionTitle}>解放される機能</Text>
         {isUnlockActive ? (
           <Text style={styles.unlockInfo}>
-            投稿カテゴリ: {currentCategory ?? '未設定'} ／ 残り時間: {minutesUntilLockout}分
+            投稿カテゴリ: {currentCategory ?? '未設定'} ／ 残り時間: {remainingMinutes || minutesUntilLockout}分
           </Text>
         ) : (
           <Text style={styles.lockedInfo}>
