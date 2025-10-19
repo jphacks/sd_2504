@@ -58,20 +58,28 @@ __「今」 「同じもの」__
 
 <div style="disple:flex; gap:10px;">
 <img src="docs/assets/IMG_2216.PNG" width="230"/>
+<img src="docs/assets/IMG_2217.PNG" width="230"/>
 <img src="docs/assets/IMG_2219.PNG" width="230"/>
-<img src="docs/assets/IMG_2220.PNG" width="230"/>
 </div>
 
 2. **みんなの一皿**: 1時間以内に同じメニューを食べている他のユーザーの食事写真が表示されます。「今、たくさんの人が私と同じものを食べている！」という共感により、今日の食事に一体感を与えます。
 
 <div style="disple:flex; gap:10px;">
-<img src="docs/assets/IMG_2216.PNG" width="230"/>
-<img src="docs/assets/IMG_2217.PNG" width="230"/>
-<img src="docs/assets/IMG_2219.PNG" width="230"/>
+<img src="docs/assets/IMG_2221.PNG" width="230"/>
 </div>
 
 3. **わいわい食堂**: 料理のカテゴリに基づきユーザーが自動でグループ化され、オンライン会議のように会話しながら食事を楽しめます。接続前に「会話の種」が提案されるので、初めての相手でも安心です。料理のカテゴリに沿って会話の種が提案され、共通の話題で盛り上がることができます。
+
+<div style="disple:flex; gap:10px;">
+<img src="docs/assets/IMG_2222.PNG" width="230"/>
+</div>
+
 4. **マイページ**: ユーザーが過去30日間に選択した食事カテゴリのデータを収集しています。詳細な機能は今後の展望を参照してください。
+
+<div style="disple:flex; gap:10px;">
+<img src="docs/assets/IMG_2222.PNG" width="230"/>
+<img src="docs/assets/IMG_2223.PNG" width="230"/>
+</div>
 
 ### 解決出来ること
 **メンタルケア**: 孤独を感じている人や食事に楽しみを見いだせない人の精神的な改善を支援します。  
