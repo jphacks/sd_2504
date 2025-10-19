@@ -8,6 +8,7 @@ import { useAppContext } from '../context/AppContext';
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { Post } from '../types';
 import { getBizmeeRoomUrl, hasBizmeeRoomsConfigured } from '../utils/bizmeeRooms';
+
 import { getSuggestionForCategory } from '../constants/categorySuggestions';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'DiningRoom'>;
@@ -77,14 +78,10 @@ export const DiningRoomScreen = ({ navigation }: Props) => {
 
         <View style={styles.suggestionBox}>
           <Text style={styles.suggestionTitle}>会話の種</Text>
-          <View style={styles.suggestionBubble}>
-            <View style={styles.suggestionPanel}>
-              <Text style={styles.suggestionText}>{suggestionText}</Text>
-              <Text style={styles.suggestionFooter}>今日の話題カードをきっかけに気軽に話しかけてみましょう。</Text>
-            </View>
-            <View style={styles.suggestionTail}>
-              <View style={styles.suggestionTailInner} />
-            </View>
+          <View style={styles.suggestionCard}>
+            <Text style={styles.suggestionText}>{suggestionText}</Text>
+            <View style={styles.suggestionDivider} />
+            <Text style={styles.suggestionFooter}>今日の話題カードをきっかけに気軽に話しかけてみましょう。</Text>
           </View>
         </View>
 
@@ -220,52 +217,34 @@ const styles = StyleSheet.create({
     color: '#3F51B5',
     marginBottom: 12,
   },
-  suggestionBubble: {
-    position: 'relative',
-    paddingBottom: 16,
-  },
-  suggestionPanel: {
-    backgroundColor: '#F4F6FF',
-    borderRadius: 12,
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    borderWidth: 2,
-    borderColor: '#3F51B5',
-    shadowColor: '#3F51B5',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
+  suggestionCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    paddingVertical: 24,
+    paddingHorizontal: 24,
+    borderWidth: 1,
+    borderColor: '#D9E2FF',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   suggestionText: {
-    fontSize: 16,
-    color: '#333',
-    lineHeight: 24,
-    fontWeight: '600',
+    fontSize: 18,
+    color: '#2F3A72',
+    lineHeight: 28,
+    fontWeight: '700',
+  },
+  suggestionDivider: {
+    height: 1,
+    backgroundColor: '#D9E2FF',
+    marginVertical: 18,
   },
   suggestionFooter: {
     fontSize: 12,
-    color: '#6F7DBF',
-    marginTop: 10,
-  },
-  suggestionTail: {
-    position: 'absolute',
-    bottom: 0,
-    left: 32,
-    width: 22,
-    height: 12,
-    transform: [{ translateY: 6 }],
-  },
-  suggestionTailInner: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#F4F6FF',
-    borderLeftWidth: 2,
-    borderBottomWidth: 2,
-    borderColor: '#3F51B5',
-    transform: [{ rotate: '45deg' }],
-    borderBottomLeftRadius: 4,
+    color: '#5E6EC8',
+    marginTop: 0,
   },
   footer: {
     marginTop: 'auto',
