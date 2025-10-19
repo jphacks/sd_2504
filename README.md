@@ -95,7 +95,7 @@ __「今」 「同じもの」__
 既存の SNS や一般的なオンラインビデオツールとの差別化に注力しました。
 * **「同じ食事カテゴリ」によるマッチング**: 「誰かと話す」ではなく、「同じものを食べている仲間と話す」状況を作り、会話の障壁を下げ、食事を楽しくすることに重点をおきました。
 * **「今」に特化した体験設計**: みんなの一皿やわいわい食堂を利用するには直近の食事写真投稿を必須とし、リアルタイム性を重視しました。
-* 料理カテゴリごとの **会話の種**: わいわい食堂入室前の「会話の種」は料理のカテゴリごとに異なるものが提案されるようにし、ルームごとに盛り上がれる共通の話題を提供しています。
+* **料理カテゴリごとの会話の種**: わいわい食堂入室前の「会話の種」は料理のカテゴリごとに異なるものが提案されるようにし、ルームごとに盛り上がれる共通の話題を提供しています。
 
 ---
 
@@ -103,14 +103,14 @@ __「今」 「同じもの」__
 ### 活用した技術
 
 #### API・データ
-- **Firebase**: Authentication / Cloud Firestore / Cloud Storage / Analytics / Cloud Functions（Firestore Trigger・HTTPS Callable）
+- **Firebase**: Authentication / Cloud Firestore / Cloud Storage / Analytics / Cloud Functions
 - **Supabase**: Storage API
 - **外部サービス**: BizMee ルーム URL（カテゴリ別オンライン食卓リンク）
 
 #### フレームワーク・ライブラリ・モジュール
-- **アプリ基盤**: Expo（React Native / React 19）、React Navigation
+- **アプリ基盤**: React Native
 - **デバイス・UI連携**: Expo AV / Camera / Image Picker / Linear Gradient / Status Bar、Async Storage、Safe Area Context、Screens、URL Polyfill
-- **BaaS SDK**: Firebase クライアント SDK、Supabase JS SDK（firebase-admin / firebase-functions 含む）
+- **BaaS SDK**: Firebase クライアント SDK、Supabase JS SDK
 - **言語・ツール**: TypeScript
 
 #### デバイス
