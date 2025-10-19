@@ -10,7 +10,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
     id: '1',
     title: 'Co-食へようこそ',
     description: 'ひとりの食事を楽しくするコミュニティ。まずは今日のごはんをシェアしましょう。',
-    image: require('../../assets/tutorial/icon.png'),
+    image: require('../../assets/tutorial/icon-2.png'),
   },
   {
     id: '2',
