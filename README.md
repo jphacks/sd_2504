@@ -77,8 +77,8 @@ __「今」 「同じもの」__
 4. **マイページ**: ユーザーが過去30日間に選択した食事カテゴリのデータを収集しています。詳細な機能は今後の展望を参照してください。
 
 <div style="disple:flex; gap:10px;">
-<img src="docs/assets/IMG_2222.PNG" width="230"/>
 <img src="docs/assets/IMG_2223.PNG" width="230"/>
+<img src="docs/assets/IMG_2224.PNG" width="230"/>
 </div>
 
 ### 解決出来ること
