@@ -5,7 +5,6 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const WAITING_POOL = "waiting_pool";
-const USERS = "users";
 const MATCHES = "matches";
 
 /**
@@ -66,13 +65,6 @@ export const onFindMatch = functions.region("asia-northeast1").firestore
 
         functions.logger.info(`Match found for ${userId} and ${matchedUserDoc.id}! Miracle: ${isMiracleMatch}`);
 
-        // 5. Award points for a Miracle Match
-        if (isMiracleMatch) {
-          const userRef = db.collection(USERS).doc(userId);
-          const matchedUserRef = db.collection(USERS).doc(matchedUserDoc.id);
-          transaction.update(userRef, { miracleMatchPoints: admin.firestore.FieldValue.increment(1) });
-          transaction.update(matchedUserRef, { miracleMatchPoints: admin.firestore.FieldValue.increment(1) });
-        }
       });
     } catch (error) {
       functions.logger.error("Matchmaking transaction failed for user:", userId, error);
