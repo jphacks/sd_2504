@@ -45,7 +45,7 @@ export const PostCaptureScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <ScreenContainer>
+    <ScreenContainer includeTopInset={false}>
       <View style={styles.container}>
         <Text style={styles.title}>投稿する写真を選びましょう</Text>
         <Text style={styles.subtitle}>カメラで撮影するか、アルバムから選択できます。</Text>
@@ -94,4 +94,3 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
 });
-

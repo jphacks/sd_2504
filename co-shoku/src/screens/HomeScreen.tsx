@@ -111,7 +111,7 @@ export const HomeScreen = ({ navigation }: Props) => {
         )}
 
         <PrimaryButton title="みんなの一皿を見る" onPress={handleNavigateTimeline} disabled={!isUnlockActive} />
-        <PrimaryButton title="わいわい食堂へ" onPress={handleNavigateDiningRoom} disabled={!isUnlockActive} />
+        <PrimaryButton title="わいわい食堂へ行く" onPress={handleNavigateDiningRoom} disabled={!isUnlockActive} />
       </View>
 
       <View style={styles.section}>
