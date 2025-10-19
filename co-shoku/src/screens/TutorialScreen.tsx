@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { FlatList, ListRenderItemInfo, Pressable, StyleSheet, Text, View, ViewToken } from 'react-native';
+import { FlatList, Image, ListRenderItemInfo, Pressable, StyleSheet, Text, View, ViewToken } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useAppContext } from '../context/AppContext';
@@ -22,7 +22,11 @@ export const TutorialScreen = () => {
   const renderItem = ({ item }: ListRenderItemInfo<TutorialSlide>) => (
     <View style={styles.slide}>
       <View style={styles.illustration}>
-        <Text style={styles.emoji}>🍽️</Text>
+        {item.image ? (
+          <Image source={item.image} style={styles.illustrationImage} resizeMode="contain" />
+        ) : (
+          <Text style={styles.emoji}>🍽️</Text>
+        )}
       </View>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.description}>{item.description}</Text>
@@ -95,6 +99,10 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 72,
+  },
+  illustrationImage: {
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 24,

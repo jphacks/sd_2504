@@ -2,7 +2,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, 
 import { Alert } from 'react-native';
 import { FOOD_CATEGORIES, getParentCategory } from '../../constants/categories';
 import { REPORT_REASONS } from '../../constants/reportReasons';
-import { CallMatch, FoodHistory, Post, Report, User } from '../../types';
+import { FoodHistory, Post, Report, User } from '../../types';
 import {
   addHours,
   getNextResetTimestampJst,

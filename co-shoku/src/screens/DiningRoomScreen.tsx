@@ -36,7 +36,7 @@ export const DiningRoomScreen = ({ navigation }: Props) => {
       return;
     }
     if (!bizmeeUrl) {
-      Alert.alert('ルームが未設定です', `${activeCategory} の BizMee ルーム URL が設定されていません。運営にお問い合わせください。`);
+      Alert.alert('ルームが未設定です', `${activeCategory} の オンラインルーム URL が設定されていません。運営にお問い合わせください。`);
       return;
     }
     const supported = await Linking.canOpenURL(bizmeeUrl);
@@ -54,23 +54,15 @@ export const DiningRoomScreen = ({ navigation }: Props) => {
   return (
     <ScreenContainer>
       <View style={styles.container}>
-        <Text style={styles.title}>オンライン食事ルーム</Text>
+        <Text style={styles.title}>わいわい食堂</Text>
         <Text style={styles.subtitle}>
-          BizMee を使って同じ料理カテゴリの仲間と気軽におしゃべりしましょう。ブラウザだけで参加できます。
+          オンラインルームで同じ料理カテゴリの仲間と気軽におしゃべりしましょう。ブラウザだけで参加できます。
         </Text>
-
-        <View style={styles.statusCard}>
-          <Text style={styles.statusText}>
-            {entered ? `こんにちは、${user?.nickname ?? 'ゲスト'}さん` : '接続準備中…'}
-          </Text>
-          <Text style={styles.statusSub}>{remainingText}</Text>
-          {activeCategory && <Text style={styles.statusHighlight}>直近の投稿カテゴリ：{activeCategory}</Text>}
-        </View>
 
         <View style={styles.instructions}>
           <Text style={styles.instructionsTitle}>参加方法</Text>
           <Text style={styles.instructionsText}>1. 写真を投稿してロックを解除します（1時間有効）。</Text>
-          <Text style={styles.instructionsText}>2. 下のボタンを押すと BizMee の専用ルームが開きます。</Text>
+          <Text style={styles.instructionsText}>2. 下のボタンを押すとオンラインの専用ルームが開きます。</Text>
           <Text style={styles.instructionsText}>3. 名前を入力するだけで参加できます（アカウント不要）。</Text>
         </View>
 
@@ -84,7 +76,8 @@ export const DiningRoomScreen = ({ navigation }: Props) => {
         )}
 
         <View style={styles.suggestionBox}>
-          <Text style={styles.suggestionTitle}>他の人と話したいときは</Text>
+          <Text style={styles.suggestionTitle}>会話の種
+          </Text>
           <Text style={styles.suggestionText}>{suggestionText}</Text>
         </View>
 

@@ -2,6 +2,7 @@ export type TutorialSlide = {
   id: string;
   title: string;
   description: string;
+  image?: number;
 };
 
 export const TUTORIAL_SLIDES: TutorialSlide[] = [
@@ -9,20 +10,24 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
     id: '1',
     title: 'Co-食へようこそ',
     description: 'ひとりの食事を楽しくするコミュニティ。まずは今日のごはんをシェアしましょう。',
+    image: require('../../assets/tutorial/icon.png'),
   },
   {
     id: '2',
-    title: '食事を投稿',
-    description: '1日3回まで料理写真を投稿できます。投稿から1時間限定で特別な機能が解放されます。',
+    title: '食事を投稿しよう',
+    description: '食事の写真を投稿すると、同じカテゴリのタイムラインとオンラインルームが1時間だけ開放されます。',
+    image: require('../../assets/tutorial/tutorial-2.png'),
   },
   {
     id: '3',
     title: '同じカテゴリでつながる',
-    description: '同じカテゴリの投稿だけがタイムラインに表示され、共通の話題で盛り上がれます。',
+    description: '同じカテゴリの投稿だけがタイムラインに表示され、共感しながら食事を楽しめます。',
+    image: require('../../assets/tutorial/tutorial-3.png'),
   },
   {
     id: '4',
-    title: 'オンライン食卓を楽しむ',
-    description: '投稿後1時間はオンライン食卓ルームや一食トークでリアルタイムに交流できます。',
+    title: 'わいわい食堂へ',
+    description: 'オンラインルームに入る前に、料理に沿った「会話の種」が表示されるので、はじめての人とも気軽に話せます！',
+    image: require('../../assets/tutorial/tutorial-4.png'),
   },
 ];

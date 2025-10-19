@@ -64,7 +64,7 @@ export const HomeScreen = ({ navigation }: Props) => {
         <Text style={styles.cardText}>
           {isDailyPostLimitEnabled
             ? `料理写真を1日${maxDailyPosts}回まで投稿できます。投稿すると1時間限定で各機能が解放されます。`
-            : '料理写真を好きなだけ投稿できます。投稿すると1時間限定で各機能が解放されます。'}
+            : '料理写真を投稿しましょう。投稿すると1時間限定で各機能が解放されます。'}
         </Text>
         <PrimaryButton
           title={canPostToday ? '投稿する' : '本日の投稿は完了'}
@@ -84,12 +84,12 @@ export const HomeScreen = ({ navigation }: Props) => {
           </Text>
         ) : (
           <Text style={styles.lockedInfo}>
-            写真を投稿すると1時間限定でタイムラインとオンライン食卓ルームを利用できます。
+            写真を投稿すると1時間限定でタイムラインとオンラインルームを利用できます。
           </Text>
         )}
 
-        <PrimaryButton title="タイムラインを見る" onPress={handleNavigateTimeline} disabled={!isUnlockActive} />
-        <PrimaryButton title="オンライン食事ルームへ" onPress={handleNavigateDiningRoom} disabled={!isUnlockActive} />
+        <PrimaryButton title="みんなの一皿を見る" onPress={handleNavigateTimeline} disabled={!isUnlockActive} />
+        <PrimaryButton title="わいわい食堂へ" onPress={handleNavigateDiningRoom} disabled={!isUnlockActive} />
       </View>
 
       <View style={styles.section}>
