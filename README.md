@@ -2,7 +2,6 @@
 
 [![IMAGE ALT TEXT HERE](https://jphacks.com/wp-content/uploads/2025/05/JPHACKS2025_ogp.jpg)](https://www.youtube.com/watch?v=lA9EluZugD8)
 
-* プレイリスト: https://www.youtube.com/playlist?list=PL5YYxTxrciB1iuwIs7vLdEZqMU0FthaC2  
 * ピッチ動画: https://youtu.be/MeG0UPHoFsA
 
 ## 製品概要
