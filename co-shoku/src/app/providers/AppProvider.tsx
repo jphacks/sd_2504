@@ -2,7 +2,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, 
 import { Alert } from 'react-native';
 import { FOOD_CATEGORIES, getParentCategory } from '../../constants/categories';
 import { REPORT_REASONS } from '../../constants/reportReasons';
-import { CallMatch, FoodHistory, Post, Report, User } from '../../types';
+import { FoodHistory, Post, Report, User } from '../../types';
 import {
   addHours,
   getNextResetTimestampJst,
@@ -22,7 +22,6 @@ import {
   createPostDocument,
   getTimelineDocuments,
   getFoodHistoryForUser,
-  incrementUserMiraclePoints,
 } from '../../services/firebase';
 
 type Credentials = {
@@ -64,8 +63,6 @@ type AppContextValue = {
   refreshTimeline: (category: string) => Promise<void>;
   foodHistory: FoodHistory[];
   myRecentCategories: string[];
-  miracleMatchPoints: number;
-  addMiracleMatchPoint: () => Promise<void>;
   reports: Report[];
   submitReport: (payload: ReportPayload) => void;
   hasPostedOnce: boolean;
@@ -102,7 +99,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [nextResetAt, setNextResetAt] = useState<string | null>(null);
   const [unlockUntil, setUnlockUntil] = useState<string | null>(null);
   const [hasPostedOnce, setHasPostedOnce] = useState(false);
-  const [miracleMatchPoints, setMiracleMatchPoints] = useState(0);
   const maxDailyPosts = 3;
   const isFirstAuthEventHandled = useRef(false);
 
@@ -126,13 +122,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             setNextResetAt(null);
             setUnlockUntil(null);
             setHasPostedOnce(false);
-            setMiracleMatchPoints(0);
             setIsLoading(false);
             return;
           }
 
           setUser(firebaseUser);
-          setMiracleMatchPoints(firebaseUser.miracleMatchPoints ?? 0);
 
           try {
             const history = await getFoodHistoryForUser(firebaseUser.id);
@@ -179,7 +173,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         await initializeFirebase();
         const newUser = await registerWithFirebase(email, password, nickname);
         setUser(newUser);
-        setMiracleMatchPoints(newUser.miracleMatchPoints ?? 0);
         setHasCompletedOnboarding(false);
         setFoodHistory([]);
         setHasPostedOnce(false);
@@ -199,7 +192,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         await initializeFirebase();
         const loggedInUser = await loginWithFirebase(email, password);
         setUser(loggedInUser);
-        setMiracleMatchPoints(loggedInUser.miracleMatchPoints ?? 0);
         const history = await getFoodHistoryForUser(loggedInUser.id);
         setFoodHistory(history);
         setHasPostedOnce(history.length > 0);
@@ -219,7 +211,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setUnlockUntil(null);
     setHasPostedOnce(false);
-    setMiracleMatchPoints(0);
     setFoodHistory([]);
     setPosts([]);
     setDailyPostCount(0);
@@ -320,27 +311,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const addMiracleMatchPoint = useCallback(async () => {
-    if (!user) {
-      return;
-    }
-    setMiracleMatchPoints((prev) => prev + 1);
-    setUser((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return {
-        ...prev,
-        miracleMatchPoints: prev.miracleMatchPoints + 1,
-      };
-    });
-    try {
-      await incrementUserMiraclePoints(user.id, 1);
-    } catch (error) {
-      console.warn('Failed to persist miracle match point', error);
-    }
-  }, [user]);
-
   const submitReport = useCallback(
     ({ reportedUserId, reason }: ReportPayload) => {
       if (!user) {
@@ -402,8 +372,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     refreshTimeline,
     foodHistory: recentHistory,
     myRecentCategories,
-    miracleMatchPoints,
-    addMiracleMatchPoint,
     reports,
     submitReport,
     hasPostedOnce,

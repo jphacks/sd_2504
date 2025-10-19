@@ -2,8 +2,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { CallSessionScreen } from '../screens/CallSessionScreen';
-import { CallWaitingScreen } from '../screens/CallWaitingScreen';
 import { CategorySelectionScreen } from '../screens/CategorySelectionScreen';
 import { DiningRoomScreen } from '../screens/DiningRoomScreen';
 import { HomeScreen } from '../screens/HomeScreen';
@@ -28,8 +26,6 @@ export type MainStackParamList = {
   CategorySelection: { imageUri?: string };
   Timeline: { category: string };
   DiningRoom: undefined;
-  CallWaiting: undefined;
-  CallSession: { partnerCategory: string };
   Report: { reportedUserId?: string };
 };
 
@@ -58,21 +54,11 @@ const MainNavigator = () => (
       component={CategorySelectionScreen}
       options={{ title: 'カテゴリを選択' }}
     />
-    <MainStack.Screen name="Timeline" component={TimelineScreen} options={{ title: 'タイムライン' }} />
+    <MainStack.Screen name="Timeline" component={TimelineScreen} options={{ title: 'みんなの一皿' }} />
     <MainStack.Screen
       name="DiningRoom"
       component={DiningRoomScreen}
-      options={{ title: 'オンライン食卓ルーム' }}
-    />
-    <MainStack.Screen
-      name="CallWaiting"
-      component={CallWaitingScreen}
-      options={{ title: '一食トーク' }}
-    />
-    <MainStack.Screen
-      name="CallSession"
-      component={CallSessionScreen}
-      options={{ title: '一食トーク' }}
+      options={{ title: 'わいわい食堂' }}
     />
     <MainStack.Screen name="Report" component={ReportScreen} options={{ title: '通報' }} />
   </MainStack.Navigator>
