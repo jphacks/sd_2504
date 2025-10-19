@@ -7,7 +7,10 @@ __「今」 「同じもの」__
 
 ![image](docs/assets/JPHACKS.png)
 
-デモ動画：https://youtu.be/MeG0UPHoFsA
+## デモ動画
+
+デモ動画：https://youtu.be/I2nhf73nCyQ
+
 ※動画の後半部分のアプリの操作画面は、開発の途中段階であるのですが、ご了承下さい。
 
 
